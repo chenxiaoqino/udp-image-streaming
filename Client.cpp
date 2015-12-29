@@ -23,44 +23,51 @@
 
 using namespace std;
 
-const int ECHOMAX = 255;          // Longest string to echo
+#include "opencv2/opencv.hpp"
+using namespace cv;
+#include "config.h"
+
 
 int main(int argc, char *argv[]) {
-  if ((argc < 3) || (argc > 4)) {   // Test for correct number of arguments
+  if ((argc < 3) || (argc > 3)) {   // Test for correct number of arguments
     cerr << "Usage: " << argv[0] 
-         << " <Server> <Echo String> [<Server Port>]\n";
+         << " <Server> <Server Port>\n";
     exit(1);
   }
 
   string servAddress = argv[1];             // First arg: server address
-  char* echoString = argv[2];               // Second arg: string to echo
-  int echoStringLen = strlen(echoString);   // Length of string to echo
-  if (echoStringLen > ECHOMAX) {    // Check input length
-    cerr << "Echo string too long" << endl;
-    exit(1);
-  }
-  unsigned short echoServPort = Socket::resolveService(
-    (argc == 4) ? argv[3] : "echo", "udp");
+  unsigned short servPort = Socket::resolveService(argv[2], "udp");
 
   try {
     UDPSocket sock;
+    int jpegqual=95;
   
-    // Send the string to the server
-    sock.sendTo(echoString, echoStringLen, servAddress, echoServPort);
-    
-
+    Mat frame, send;
+    vector<uchar> encoded;
+    VideoCapture cap(0);//get the camera
+    namedWindow("send",CV_WINDOW_AUTOSIZE);
+    if(!cap.isOpened()){
+      cerr << "OpenCV Failed to open camera";
+      exit(1);
+    }
     while(1){
-      // Receive a response
-      char echoBuffer[ECHOMAX + 1];       // Buffer for echoed string + \0
-      int respStringLen;                  // Length of received response
-      respStringLen = sock.recv(echoBuffer, ECHOMAX);
-      //if ((respStringLen = sock.recv(echoBuffer, ECHOMAX)) != echoStringLen) {
-      //  cerr << "Unable to receive" << endl;
-      //  exit(1);
-      //}
-    
-      echoBuffer[respStringLen] = '\0';             // Terminate the string!
-      cout << "Received: " << echoBuffer << endl;   // Print the echoed arg
+      cap >> frame;
+      resize(frame, send, Size(FRAME_WIDTH,FRAME_HEIGHT), 0, 0, INTER_LINEAR);
+      vector<int> compression_params;
+      compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+      compression_params.push_back(jpegqual);
+
+      imencode(".jpg", send, encoded, compression_params);
+      imshow("send", send);
+      cout<<"sizeof encd:"<<encoded.size()<<endl;
+      if(encoded.size()>8190)//too big for udp! //shouldn't it bt 65535?
+      {
+        cout<<"reducing jpeg quality..."<<jpegqual<<endl;
+        jpegqual--;continue;
+      }
+
+      sock.sendTo(&encoded.front(), encoded.size(), servAddress, servPort);
+      waitKey(FRAME_INTERVAL);
     }
     // Destructor closes the socket
 

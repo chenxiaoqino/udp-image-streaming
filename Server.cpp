@@ -21,7 +21,10 @@
 #include <iostream>          // For cout and cerr
 #include <cstdlib>           // For atoi()
 
-#define BUF_LEN 1024
+#define BUF_LEN 65540
+
+#include "opencv2/opencv.hpp"
+using namespace cv;
 
 int main(int argc, char *argv[]) {
 
@@ -30,30 +33,38 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  unsigned short echoServPort = atoi(argv[1]);     // First arg:  local port
+  unsigned short servPort = atoi(argv[1]);     // First arg:  local port
 
+  namedWindow("recv",CV_WINDOW_AUTOSIZE);
   try {
-    UDPSocket sock(echoServPort);                
+    UDPSocket sock(servPort);                
   
     char buffer[BUF_LEN];         // Buffer for echo string
     int recvMsgSize;                  // Size of received message
     string sourceAddress;             // Address of datagram source
     unsigned short sourcePort;        // Port of datagram source
+    
+
     for (;;) {  // Run forever
       // Block until receive message from a client
       recvMsgSize = sock.recvFrom(buffer, BUF_LEN, sourceAddress, 
                                       sourcePort);
   
       cout << "Received packet from " << sourceAddress << ":" 
-           << sourcePort << endl;
+        << sourcePort << endl;
+      //cout << "Length:" << recvMsgSize << "w/ first Char:" 
+      //  << buffer[0] <<endl;
   
-      for (int i=0;;i++){
-        sprintf(buffer,"seq: %d:\n",i);
-        sock.sendTo(buffer, strlen(buffer), sourceAddress, sourcePort);
-        sleep(1);
+      //for (int i=0;;i++){
+      //  sprintf(buffer,"seq: %d:\n",i);
+      //  sock.sendTo(buffer, strlen(buffer), sourceAddress, sourcePort);
+      //  sleep(1);
         //cout<<ret<<endl;
-      }  
-
+      //}  
+      Mat rawData = Mat( 1, recvMsgSize, CV_8UC1, buffer );
+      Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+      imshow("recv", frame);
+      waitKey(1);
     }
   } catch (SocketException &e) {
     cerr << e.what() << endl;
