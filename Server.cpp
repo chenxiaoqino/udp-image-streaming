@@ -25,6 +25,7 @@
 
 #include "opencv2/opencv.hpp"
 using namespace cv;
+#include "config.h"
 
 int main(int argc, char *argv[]) {
 
@@ -47,9 +48,24 @@ int main(int argc, char *argv[]) {
 
     for (;;) {  // Run forever
       // Block until receive message from a client
-      recvMsgSize = sock.recvFrom(buffer, BUF_LEN, sourceAddress, 
-                                      sourcePort);
-  
+      do{
+        recvMsgSize = sock.recvFrom(buffer, BUF_LEN, sourceAddress, sourcePort);
+      }while(recvMsgSize>sizeof(int));
+      int total_pack=((int*) buffer)[0];
+
+      cout<<"expecting length of packs:"<<total_pack<<endl;
+      char* longbuf=new char[PACK_SIZE*total_pack];
+      for(int i=0;i<total_pack;i++){
+        recvMsgSize = sock.recvFrom(buffer, BUF_LEN, sourceAddress, sourcePort);
+        if(recvMsgSize != PACK_SIZE){
+          cerr << "Received unexpected size pack:" << recvMsgSize << endl;
+          continue;
+        }
+        memcpy(&longbuf[i*PACK_SIZE], buffer, PACK_SIZE);
+      }
+
+
+
       cout << "Received packet from " << sourceAddress << ":" 
         << sourcePort << endl;
       //cout << "Length:" << recvMsgSize << "w/ first Char:" 
@@ -61,9 +77,14 @@ int main(int argc, char *argv[]) {
       //  sleep(1);
         //cout<<ret<<endl;
       //}  
-      Mat rawData = Mat( 1, recvMsgSize, CV_8UC1, buffer );
+      Mat rawData = Mat( 1, PACK_SIZE*total_pack, CV_8UC1, longbuf );
       Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+      if(frame.size().width==0){
+        cerr<< "decode failure!" <<endl;
+        continue;
+      }
       imshow("recv", frame);
+      free(longbuf);
       waitKey(1);
     }
   } catch (SocketException &e) {

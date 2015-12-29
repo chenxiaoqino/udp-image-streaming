@@ -60,13 +60,21 @@ int main(int argc, char *argv[]) {
       imencode(".jpg", send, encoded, compression_params);
       imshow("send", send);
       cout<<"sizeof encd:"<<encoded.size()<<endl;
-      if(encoded.size()>8190)//too big for udp! //shouldn't it bt 65535?
-      {
-        cout<<"reducing jpeg quality..."<<jpegqual<<endl;
-        jpegqual--;continue;
-      }
+      //if(encoded.size()>8190)//too big for udp! //shouldn't it bt 65535?
+      //{
+      //  cout<<"reducing jpeg quality..."<<jpegqual<<endl;
+      //  jpegqual--;continue;
+      //}
+      //sock.sendTo(&encoded.front(), encoded.size(), servAddress, servPort);
+      int total_pack=1+(encoded.size()-1)/PACK_SIZE;
 
-      sock.sendTo(&encoded.front(), encoded.size(), servAddress, servPort);
+      int  ibuf[1];ibuf[0]=total_pack;
+      sock.sendTo(ibuf, sizeof(int), servAddress, servPort);
+
+      for(int i=0;i<total_pack;i++)
+        sock.sendTo(&encoded[i*PACK_SIZE], PACK_SIZE, servAddress, servPort);
+      
+
       waitKey(FRAME_INTERVAL);
     }
     // Destructor closes the socket
