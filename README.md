@@ -6,7 +6,7 @@ Parameters such as stream size or quality can be adjusted in `config.h` before r
 
 ## Grabbing
 
-The code grabs video stream from OpenCV's default input video device. To change input source, simply change the argument passed to CV::VideoCapture() accordingly.
+The code grabs video stream from OpenCV's default input video device. To change input source, simply change the argument passed to `cv::VideoCapture()` accordingly.
 
 ## Encoding
 
@@ -16,16 +16,16 @@ If passing raw image is preferred, consider changing `jpeg` to `bmp`.
 
 ## Demo
 
-Run the following command to see stream your camera through localhost:
+Run the following command to see stream your camera through localhost: (`CMake` and `OpenCV` required)
 ```
+git clone https://github.com/chenxiaoqino/udp-image-streaming.git
+cd udp-image-streaming/
 cmake . && make
 ./server 10000 &
-./client localhost 10000
+./client 127.0.0.1 10000
 ```
 
-You should see two windows, one the original grabbed image (before encoding) and one received stream image (after encoding/decoding).
+You should see two windows, one with the original grabbed image (before encoding) and one with received live-stream image (after encoding/decoding).
 
 ## Acknowledgement and Copyright
-This project includes some code from [Practical C++ Sockets](http://cs.ecs.baylor.edu/~donahoo/practical/CSockets/practical/) and requires [OpenCV 3](http://opencv.org/).
-
-This project is puslished under GPLv3.
+This project includes some code from [Practical C++ Sockets](http://cs.ecs.baylor.edu/~donahoo/practical/CSockets/practical/) and requires [OpenCV 3](http://opencv.org/). This project is puslished under GPLv3.
