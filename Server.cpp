@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     string sourceAddress;             // Address of datagram source
     unsigned short sourcePort;        // Port of datagram source
     
+    clock_t last_cycle=clock();
 
     for (;;) {  // Run forever
       // Block until receive message from a client
@@ -85,7 +86,14 @@ int main(int argc, char *argv[]) {
       }
       imshow("recv", frame);
       free(longbuf);
+
       waitKey(1);
+      clock_t next_cycle=clock();
+      double duration=(next_cycle-last_cycle) / (double) CLOCKS_PER_SEC;   
+      cout <<"\teffective FPS:" <<(1/duration)<<" \tkbps:"<<(PACK_SIZE*total_pack/duration/1024*8)<<endl;
+      
+      cout<<next_cycle-last_cycle;
+      last_cycle=next_cycle;
     }
   } catch (SocketException &e) {
     cerr << e.what() << endl;

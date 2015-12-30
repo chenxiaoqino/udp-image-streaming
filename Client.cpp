@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
   try {
     UDPSocket sock;
-    int jpegqual=95;
+    int jpegqual=80;
   
     Mat frame, send;
     vector<uchar> encoded;
@@ -50,6 +50,8 @@ int main(int argc, char *argv[]) {
       cerr << "OpenCV Failed to open camera";
       exit(1);
     }
+
+    clock_t last_cycle=clock();
     while(1){
       cap >> frame;
       resize(frame, send, Size(FRAME_WIDTH,FRAME_HEIGHT), 0, 0, INTER_LINEAR);
@@ -74,8 +76,14 @@ int main(int argc, char *argv[]) {
       for(int i=0;i<total_pack;i++)
         sock.sendTo(&encoded[i*PACK_SIZE], PACK_SIZE, servAddress, servPort);
       
-
       waitKey(FRAME_INTERVAL);
+
+      clock_t next_cycle=clock();
+      double duration=(next_cycle-last_cycle) / (double) CLOCKS_PER_SEC;   
+      cout <<"\teffective FPS:" <<(1/duration)<<" \tkbps:"<<(PACK_SIZE*total_pack/duration/1024*8)<<endl;
+      
+      cout<<next_cycle-last_cycle;
+      last_cycle=next_cycle;
     }
     // Destructor closes the socket
 
