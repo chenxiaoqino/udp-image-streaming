@@ -40,7 +40,7 @@ int main(int argc, char * argv[]) {
 
     try {
         UDPSocket sock;
-        int jpegqual = 80; // Compression Parameter
+        int jpegqual =  ENCODE_QUALITY; // Compression Parameter
 
         Mat frame, send;
         vector < uchar > encoded;
