@@ -1,6 +1,7 @@
 /*
- *   C++ sockets on Unix and Windows
- *   Copyright (C) 2002
+ *   C++ UDP socket client for live image upstreaming
+ *   Modified from http://cs.ecs.baylor.edu/~donahoo/practical/CSockets/practical/UDPEchoClient.cpp
+ *   Copyright (C) 2015
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
