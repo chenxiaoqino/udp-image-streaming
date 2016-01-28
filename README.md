@@ -28,4 +28,4 @@ cmake . && make
 You should see two windows, one with the original grabbed image (before encoding) and one with received live-stream image (after encoding/decoding).
 
 ## Acknowledgement and Copyright
-This project includes some code from [Practical C++ Sockets](http://cs.ecs.baylor.edu/~donahoo/practical/CSockets/practical/) and requires [OpenCV 3](http://opencv.org/). This project is puslished under GPLv3.
+This project is built upon various open-sourced libraries, like [Practical C++ Sockets](http://cs.ecs.baylor.edu/~donahoo/practical/CSockets/practical/) and [OpenCV 3](http://opencv.org/) ; please refer to their original license accordingly (GPL/BSD). Code of this project is puslished under MIT License.
