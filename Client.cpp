@@ -54,6 +54,7 @@ int main(int argc, char * argv[]) {
         clock_t last_cycle = clock();
         while (1) {
             cap >> frame;
+            if(frame.Size().width==0)continue;//simple integrity check; skip erroneous data...
             resize(frame, send, Size(FRAME_WIDTH, FRAME_HEIGHT), 0, 0, INTER_LINEAR);
             vector < int > compression_params;
             compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
