@@ -45,7 +45,7 @@ int main(int argc, char * argv[]) {
         Mat frame, send;
         vector < uchar > encoded;
         VideoCapture cap(0); // Grab the camera
-        namedWindow("send", CV_WINDOW_AUTOSIZE);
+        namedWindow("send", WINDOW_AUTOSIZE);
         if (!cap.isOpened()) {
             cerr << "OpenCV Failed to open camera";
             exit(1);
@@ -57,7 +57,7 @@ int main(int argc, char * argv[]) {
             if(frame.size().width==0)continue;//simple integrity check; skip erroneous data...
             resize(frame, send, Size(FRAME_WIDTH, FRAME_HEIGHT), 0, 0, INTER_LINEAR);
             vector < int > compression_params;
-            compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+            compression_params.push_back(IMWRITE_JPEG_QUALITY);
             compression_params.push_back(jpegqual);
 
             imencode(".jpg", send, encoded, compression_params);
