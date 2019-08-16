@@ -37,7 +37,7 @@ int main(int argc, char * argv[]) {
 
     unsigned short servPort = atoi(argv[1]); // First arg:  local port
 
-    namedWindow("recv", CV_WINDOW_AUTOSIZE);
+    namedWindow("recv", WINDOW_AUTOSIZE);
     try {
         UDPSocket sock(servPort);
 
@@ -69,7 +69,7 @@ int main(int argc, char * argv[]) {
             cout << "Received packet from " << sourceAddress << ":" << sourcePort << endl;
  
             Mat rawData = Mat(1, PACK_SIZE * total_pack, CV_8UC1, longbuf);
-            Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+            Mat frame = imdecode(rawData, IMREAD_COLOR);
             if (frame.size().width == 0) {
                 cerr << "decode failure!" << endl;
                 continue;
